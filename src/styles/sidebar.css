@@ -1,0 +1,33 @@
+.sidebar {
+  width: 260px;
+  background: #fbfbfa;
+  border-right: 1px solid #e5e5e5;
+  padding: 12px;
+}
+
+.page-item {
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.page-item:hover {
+  background: #ededeb;
+}
+
+.page-item.active {
+  background: #dfdfdd;
+}
+
+.delete-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.add-page {
+  margin-top: 12px;
+  width: 100%;
+}

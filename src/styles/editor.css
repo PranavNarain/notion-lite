@@ -1,0 +1,19 @@
+.editor {
+  flex: 1;
+  padding: 40px;
+  background: white;
+}
+
+.page-title {
+  font-size: 28px;
+  border: none;
+  outline: none;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.timestamp {
+  margin-top: 10px;
+  display: block;
+  color: gray;
+}

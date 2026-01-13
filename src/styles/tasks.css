@@ -1,0 +1,25 @@
+.tasks {
+  padding: 24px;
+}
+
+.task-input input {
+  width: 100%;
+  padding: 10px;
+  background: #252525;
+  border: 1px solid #333;
+  color: white;
+  border-radius: 6px;
+}
+
+.task {
+  padding: 10px;
+  margin-top: 8px;
+  background: #222;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.task.done {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
