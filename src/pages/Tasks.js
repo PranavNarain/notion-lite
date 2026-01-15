@@ -1,40 +1,45 @@
 import React, { useEffect, useState } from "react";
+import { fetchTasks, createTask, deleteTask } from "../api/tasks";
 
 function Tasks() {
   const [tasks, setTasks] = useState([]);
   const [text, setText] = useState("");
 
-  /* Load tasks */
+  /* ---------- LOAD TASKS FROM AWS ---------- */
   useEffect(() => {
-    const saved = localStorage.getItem("tasks");
-    if (saved) setTasks(JSON.parse(saved));
+    fetchTasks().then((data) => {
+      setTasks(Array.isArray(data) ? data : []);
+    });
   }, []);
 
-  /* Save tasks */
-  useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
-
-  const addTask = () => {
+  const addTask = async () => {
     if (!text.trim()) return;
 
-    setTasks([
-      ...tasks,
-      { id: Date.now(), text, done: false },
-    ]);
+    const newTask = {
+      id: Date.now().toString(),
+      text,
+      done: false
+    };
+
+    setTasks((prev) => [...prev, newTask]);
     setText("");
+
+    await createTask(newTask);
   };
 
-  const toggle = (id) => {
-    setTasks(
-      tasks.map((t) =>
-        t.id === id ? { ...t, done: !t.done } : t
-      )
+  const toggle = async (id) => {
+    const updated = tasks.map((t) =>
+      t.id === id ? { ...t, done: !t.done } : t
     );
+    setTasks(updated);
+
+    const changed = updated.find((t) => t.id === id);
+    await createTask(changed); // upsert
   };
 
-  const remove = (id) => {
-    setTasks(tasks.filter((t) => t.id !== id));
+  const remove = async (id) => {
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+    await deleteTask(id);
   };
 
   return (
@@ -64,10 +69,7 @@ function Tasks() {
             </span>
 
             {t.done && (
-              <button
-                className="delete-btn"
-                onClick={() => remove(t.id)}
-              >
+              <button className="delete-btn" onClick={() => remove(t.id)}>
                 ✕
               </button>
             )}

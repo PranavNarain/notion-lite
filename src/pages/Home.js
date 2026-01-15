@@ -3,71 +3,59 @@ import Sidebar from "../components/Sidebar";
 import Editor from "../components/Editor";
 import Tasks from "../pages/Tasks";
 import Header from "../components/Header";
-import initialPages from "../data/dummyPages";
+import { fetchNotes, createNote } from "../api/notes";
 import "../styles/app.css";
 
 function Home() {
-  /* ---------- PAGES (NOTES) STATE ---------- */
-  const [pages, setPages] = useState(() => {
-    const saved = localStorage.getItem("pages");
-    return saved ? JSON.parse(saved) : initialPages;
-  });
+  const [pages, setPages] = useState([]);
+  const [activeId, setActiveId] = useState(null);
+  const [activeTab, setActiveTab] = useState("notes");
 
-  const [activeId, setActiveId] = useState(() => {
-    const saved = localStorage.getItem("activePageId");
-    return saved || (initialPages[0] && initialPages[0].id);
-  });
-
-  /* ---------- TABS STATE ---------- */
-  const [activeTab, setActiveTab] = useState("notes"); // notes | tasks
-
-  /* ---------- PERSIST NOTES ---------- */
+  /* ---------- LOAD NOTES FROM AWS ---------- */
   useEffect(() => {
-    localStorage.setItem("pages", JSON.stringify(pages));
-  }, [pages]);
-
-  useEffect(() => {
-    if (activeId) {
-      localStorage.setItem("activePageId", activeId);
-    }
-  }, [activeId]);
+    fetchNotes().then((data) => {
+      const notes = Array.isArray(data) ? data : [];
+      setPages(notes);
+      if (notes.length > 0) setActiveId(notes[0].id);
+    });
+  }, []);
 
   const activePage = pages.find((p) => p.id === activeId);
 
   /* ---------- NOTES ACTIONS ---------- */
-  const addPage = () => {
+
+  const addPage = async () => {
     const newPage = {
       id: Date.now().toString(),
       title: "Untitled",
       content: "",
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     setPages((prev) => [newPage, ...prev]);
     setActiveId(newPage.id);
     setActiveTab("notes");
+
+    await createNote(newPage);
   };
 
   const deletePage = (id) => {
     const filtered = pages.filter((p) => p.id !== id);
     setPages(filtered);
-
     if (id === activeId && filtered.length) {
       setActiveId(filtered[0].id);
     }
+    // (optional) later we can add DELETE API
   };
 
-  const updatePage = (updated) => {
+  const updatePage = async (updated) => {
     setPages((prev) =>
-      prev.map((p) =>
-        p.id === updated.id
-          ? { ...updated, updatedAt: new Date().toISOString() }
-          : p
-      )
+      prev.map((p) => (p.id === updated.id ? updated : p))
     );
+
+    await createNote(updated); // upsert
   };
 
-  /* ---------- RENDER ---------- */
   return (
     <div className="app">
       <Sidebar
