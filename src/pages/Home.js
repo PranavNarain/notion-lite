@@ -5,6 +5,7 @@ import Tasks from "../pages/Tasks";
 import Header from "../components/Header";
 import { fetchNotes, createNote } from "../api/notes";
 import "../styles/app.css";
+import { deleteNote } from "../api/notes"; 
 
 function Home() {
   const [pages, setPages] = useState([]);
@@ -13,12 +14,21 @@ function Home() {
 
   /* ---------- LOAD NOTES FROM AWS ---------- */
   useEffect(() => {
-    fetchNotes().then((data) => {
-      const notes = Array.isArray(data) ? data : [];
-      setPages(notes);
-      if (notes.length > 0) setActiveId(notes[0].id);
-    });
-  }, []);
+  fetchNotes().then((data) => {
+    const notes = Array.isArray(data)
+      ? data.map((n) => ({
+          id: n.pageId,        // 🔥 map backend → frontend
+          title: n.title,
+          content: n.content,
+          updatedAt: n.updatedAt
+        }))
+      : [];
+
+    setPages(notes);
+    if (notes.length > 0) setActiveId(notes[0].id);
+  });
+}, []);
+
 
   const activePage = pages.find((p) => p.id === activeId);
 
@@ -39,14 +49,16 @@ function Home() {
     await createNote(newPage);
   };
 
-  const deletePage = (id) => {
-    const filtered = pages.filter((p) => p.id !== id);
-    setPages(filtered);
-    if (id === activeId && filtered.length) {
-      setActiveId(filtered[0].id);
-    }
-    // (optional) later we can add DELETE API
-  };
+ const deletePage = async (id) => {
+  const filtered = pages.filter((p) => p.id !== id);
+  setPages(filtered);
+
+  if (id === activeId && filtered.length) {
+    setActiveId(filtered[0].id);
+  }
+
+  await deleteNote(id);
+};
 
   const updatePage = async (updated) => {
     setPages((prev) =>

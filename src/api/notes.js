@@ -12,3 +12,10 @@ export const createNote = async (note) => {
     body: JSON.stringify(note)
   });
 };
+export const deleteNote = async (id) => {
+  await fetch(`${API_BASE_URL}/notes`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  });
+};

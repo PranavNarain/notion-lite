@@ -7,10 +7,19 @@ function Tasks() {
 
   /* ---------- LOAD TASKS FROM AWS ---------- */
   useEffect(() => {
-    fetchTasks().then((data) => {
-      setTasks(Array.isArray(data) ? data : []);
-    });
-  }, []);
+  fetchTasks().then((data) => {
+    const mapped = Array.isArray(data)
+      ? data.map((t) => ({
+          id: t.taskId,     // 🔥 map backend → frontend
+          text: t.text,
+          done: t.done
+        }))
+      : [];
+
+    setTasks(mapped);
+  });
+}, []);
+
 
   const addTask = async () => {
     if (!text.trim()) return;
