@@ -10,7 +10,7 @@ function Editor({ page, onUpdate }) {
       setTitle(page.title);
       setContent(page.content);
     }
-  }, [page?.id]); // IMPORTANT
+  }, [page]); // IMPORTANT
 
   if (!page) {
     return <div className="editor empty">Select or create a page</div>;
