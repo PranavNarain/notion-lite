@@ -1,70 +1,287 @@
-# Getting Started with Create React App
+# Notion Lite – Full Stack Serverless Notes & Tasks App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A Notion-inspired full‑stack web application built using **React** and **AWS Serverless architecture** (Lambda, API Gateway, DynamoDB) with **CI/CD deployment to S3 + CloudFront using GitHub Actions**.
 
-## Available Scripts
+This README serves as a **complete technical guide** to understand, run, deploy, and reproduce the project from scratch.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## Table of Contents
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Project Overview
+2. Features
+3. Tech Stack
+4. Architecture
+5. Project Structure
+6. Local Setup (Frontend)
+7. AWS Backend Setup
+8. Database Setup (DynamoDB)
+9. API Gateway Setup
+10. Frontend ↔ Backend Integration
+11. CI/CD Setup (GitHub Actions)
+12. Production Deployment
+13. Common Issues & Debugging
+14. Cost Management
+15. Project Links
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## 1. Project Overview
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Notion Lite is a cloud‑based productivity web application that allows users to:
 
-### `npm run build`
+* Create, edit, and delete notes
+* Manage daily tasks
+* Store all data persistently in AWS DynamoDB
+* Access the app securely via CloudFront CDN
+* Automatically deploy updates using CI/CD
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 2. Features
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+* Notes editor
+* Daily tasks management
+* Persistent cloud storage
+* Serverless REST APIs
+* Global CDN delivery
+* HTTPS enabled
+* Automated deployments
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 3. Tech Stack
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+**Frontend:** React.js, JavaScript, HTML, CSS
+**Backend:** AWS Lambda (Node.js), API Gateway
+**Database:** DynamoDB (Composite keys)
+**DevOps:** GitHub Actions, S3, CloudFront
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 4. Architecture
 
-## Learn More
+```
+Browser
+   ↓
+CloudFront (CDN)
+   ↓
+S3 (React Build)
+   ↓
+API Gateway
+   ↓
+Lambda
+   ↓
+DynamoDB
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 5. Project Structure
 
-### Code Splitting
+```
+src/
+ ├── api/            # API clients
+ ├── components/     # UI components
+ ├── pages/          # Home, Tasks
+ ├── styles/         # CSS
+ ├── config.js       # API base URL
+ └── index.js
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+.github/workflows/
+ └── deploy.yml      # CI/CD pipeline
+```
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 6. Local Setup (Frontend)
 
-### Making a Progressive Web App
+### Prerequisites
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+* Node.js 18+
+* Git
 
-### Advanced Configuration
+### Steps
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+git clone https://github.com/PranavNarain/notion-lite.git
+cd notion-lite
+npm install
+npm start
+```
 
-### Deployment
+App runs at:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```
+http://localhost:3000
+```
 
-### `npm run build` fails to minify
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 7. AWS Backend Setup
+
+### Create Lambda Function
+
+* Runtime: Node.js 18
+* Create file: `index.mjs`
+* Enable CORS responses
+
+Lambda responsibilities:
+
+* Handle /notes and /tasks routes
+* Perform CRUD operations on DynamoDB
+
+---
+
+## 8. DynamoDB Setup
+
+Create two tables:
+
+### NotionLiteNotes
+
+| Key         | Type   |
+| ----------- | ------ |
+| userId (PK) | String |
+| pageId (SK) | String |
+
+### NotionLiteTasks
+
+| Key         | Type   |
+| ----------- | ------ |
+| userId (PK) | String |
+| taskId (SK) | String |
+
+---
+
+## 9. API Gateway Setup
+
+Create REST API with routes:
+
+### Notes
+
+* GET /notes
+* POST /notes
+* DELETE /notes
+
+### Tasks
+
+* GET /tasks
+* POST /tasks
+* DELETE /tasks
+
+Enable:
+
+* Lambda proxy integration
+* CORS for all routes
+
+Deploy stage: `dev`
+
+---
+
+## 10. Frontend ↔ Backend Integration
+
+Set API URL in:
+
+```
+src/config.js
+```
+
+```js
+export const API_BASE_URL = "https://<api-id>.execute-api.<region>.amazonaws.com/dev";
+```
+
+Use fetch API in:
+
+* src/api/notes.js
+* src/api/tasks.js
+
+---
+
+## 11. CI/CD Setup (GitHub Actions)
+
+### Workflow File
+
+```
+.github/workflows/deploy.yml
+```
+
+Pipeline steps:
+
+1. Install dependencies
+2. Build React app
+3. Upload to S3
+4. Invalidate CloudFront cache
+
+### Required GitHub Secrets
+
+* AWS_ACCESS_KEY_ID
+* AWS_SECRET_ACCESS_KEY
+* AWS_REGION
+* S3_BUCKET
+* CLOUDFRONT_ID
+
+---
+
+## 12. Production Deployment
+
+### Create S3 bucket
+
+* Enable static website hosting
+* Allow public access
+
+### Create CloudFront distribution
+
+* Origin: S3 bucket
+* Default root object: index.html
+
+### Trigger deployment
+
+```bash
+git push origin main
+```
+
+App will be live at CloudFront domain.
+
+---
+
+## 13. Common Issues & Debugging
+
+| Problem            | Cause              | Fix                   |
+| ------------------ | ------------------ | --------------------- |
+| Notes disappear    | Backend not saving | Check Lambda logs     |
+| Delete not working | Wrong DynamoDB key | Use composite keys    |
+| CI build fails     | ESLint warnings    | Fix warnings          |
+| Old version shown  | Cache issue        | Invalidate CloudFront |
+
+---
+
+## 14. Cost Management
+
+Recommended after learning:
+
+* Delete CloudFront distribution
+* Delete S3 bucket
+* Delete Lambda
+* Delete API Gateway
+* Delete DynamoDB tables
+* Delete IAM user
+
+Set AWS billing alarm at $1.
+
+---
+
+## 15. Project Links
+
+* GitHub Repository: [https://github.com/PranavNarain/notion-lite](https://github.com/PranavNarain/notion-lite)
+* GitHub Profile: [https://github.com/PranavNarain](https://github.com/PranavNarain)
+
+---
+
+## Author
+
+Pranav Narain
+Full Stack & Cloud Developer
+
+---
+
+*End of README*
