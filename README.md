@@ -62,7 +62,7 @@ Notion Lite is a cloud‑based productivity web application that allows users to
 ## 4. Architecture
 
 ```
-<img width="1106" height="661" alt="notion-lite-architecture-diagram" src="https://github.com/user-attachments/assets/813f6607-7746-4884-86c3-168e1828fc77" />
+![Notion Lite Architecture](docs/notion-lite-architecture.png)
 
 ```
 
